@@ -1,0 +1,115 @@
+前几天一同事去xx头条面试前端开发，遇到了一个面试问题，当时面试官是希望他通过当场思考以后说出答案，并说出解答的思路，问题是这样的：
+
+我手中有一堆扑克牌， 但是观众不知道它的顺序。
+
+1、第一步， 我从牌顶拿出一张牌， 放到桌子上。
+
+2、第二步， 我从牌顶再拿一张牌， 放在手上牌的底部。
+
+3、第三步， 重复第一步、第二步的操作， 直到我手中所有的牌都放到了桌子上。
+
+最后， 观众可以看到桌子上牌的顺序是：(牌底部）1,2,3,4,5,6,7,8,9,10,11,12,13(牌顶部）
+
+请问， 我刚开始拿在手里的牌的顺序是什么？
+
+给我一说，吓了我一大跳，现在的面试题都这么复杂了,说实话真换做我，当场也答不出来！
+
+接下来这半天里，通过手动演示，加上程序debug终于把这玩意搞出来了
+
+先说说我的思路
+
+你的手里拿了13张牌，每一次往桌子上放牌的时候，还要把手牌的第一张放到手牌的最后， 那可以推理出这可以通过13次的循环来完成，每次循环执行两个动作
+
+1、先将手牌最上面一张放在桌子上
+
+2、再将手牌中最上面的一张放手牌的最后
+
+以上的这种操作，我称他为正向操作，也就是手牌到桌子上
+
+问题中是知道了桌子上的结果，需要知道初始手牌的顺序，那其实就是把上面的操作以反向形式操作一次，也就是从桌子上到手里，简称反向操作
+
+来看看代码Java代码的实现：
+
+    package xyz.abc.test;
+
+    import com.google.common.primitives.Ints;
+
+    import java.util.Arrays;
+    import java.util.LinkedList;
+    import java.util.Queue;
+
+
+     * @date 2018/11/7 17:37
+     */
+    public class PokerService {
+        /**
+         * 正向，从手到桌子 t2 = {1,12,2,8,3,11,4,9,5,13,6,10,7};
+         * 返回 ｛13,12,11,10,9,8,7,6,5,4,3,2,1};
+         *
+         * @param pokers
+         */
+        public void sort2(int[] pokers) {
+            //13张牌转换成数组  方便操作，不用考虑太多
+            LinkedList<Integer> pokerList = new LinkedList<>();
+            for (int poker : pokers) {
+                pokerList.add(poker);
+            }
+            //声明一个新的容器，在这里可以理解成桌子
+            LinkedList<Integer> newPokers2 = new LinkedList<>();
+            for (int i = 0; i < pokers.length; i++) {
+                //将手牌中的第一张放在桌子上
+                newPokers2.add(pokerList.pollFirst());
+                //假如这是最后一次循环手牌已经没有了就不需要进入这个判断了
+                if (pokerList.size() > 0) {
+                    //将第一张放在牌堆的最后
+                    pokerList.addLast(pokerList.pollFirst());
+                }
+            }
+            //循环打印到控制台，
+            newPokers2.forEach(System.out::println);
+        }
+
+        /**
+         * 这里的操作是从桌子把牌拿回到手上
+         * 从桌子 到 手上 int[] t = {13,12,11,10,9,8,7,6,5,4,3,2,1};
+         * 返回 {1,12,2,8,3,11,4,9,5,13,6,10,7}
+         *
+         * @param pokers
+         */
+       public void sort(int[] pokers) {
+            //从数组转换成list,只是为了方便操作，不用考虑其它的
+            LinkedList<Integer> pokerList = new LinkedList<>(Ints.asList(pokers));
+            //声明一个目标容器，理解成手
+            LinkedList<Integer> newPokers2 = new LinkedList<>();
+            for (Integer aPokerList : pokerList) {
+                //判断手上的牌是否大于1张
+                if (newPokers2.size() > 1) {
+                    //如果大于一张，则把手牌的最后一张放在最上面
+                    newPokers2.addFirst(newPokers2.pollLast());
+                }
+                //从桌子上拿一张牌放在手上
+                newPokers2.addFirst(aPokerList);
+            }
+            //循环打印到控制台，
+            newPokers2.forEach(System.out::println);
+        }
+    }
+
+有同学问，在这里是否要使用数组来完成？
+
+我的建议：
+
+1、数组概念是一组连续的内存空间，存储相同的类型的数据，那么对于这么多的数据移动操作来说，数组需要不停的重新分配的新的内存空间，对于内存来说不是很友好
+
+2、LinkedList的本质是一个双向链表，链表中对内存空间的连续性并没有要求，且中间结点的增加与删除，那效率优于数组，而且本身提供了pollFirst 和 pollLast方法
+
+基于以上两点，链表更适合当前这个场景
+
+
+
+以上仅是个人思路，大家有更好的解题思路，望大家能赐教
+---------------------
+作者：长风dad
+来源：CSDN
+原文：https://blog.csdn.net/qinfeng9988/article/details/83868644
+版权声明：本文为博主原创文章，转载请附上博文链接！
