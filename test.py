@@ -32,10 +32,17 @@ if __name__ == '__main__':
     # nums[1:]=n
     # print m
     # print nums
-    global a
-    a=0
-    def cc():
-        global a
-        a=a+1
-        print a
-    cc()
+    # global a
+    # a=0
+    # def cc():
+    #     global a
+    #     a=a+1
+    #     print a
+    # cc()
+    t=(2,3)
+    x=2
+    y=3
+    if t==(x,y):
+        print 0
+    else:
+        print 1
